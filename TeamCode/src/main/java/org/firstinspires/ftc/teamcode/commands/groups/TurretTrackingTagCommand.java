@@ -65,15 +65,15 @@ public class TurretTrackingTagCommand extends CommandBase {
                 Pose tagPose = APRILTAG_POS.get(tagID);
                 Pose robotPose = follower.getPose();
 
-                // 필드 절대 각도 (내 위치 -> 태그 위치)
-                double deltaX = tagPose.getX() - (robotPose.getX() * 25.4);
-                double deltaY = tagPose.getY() - (robotPose.getY() * 25.4);
-                double fieldHeading = Math.toDegrees(Math.atan2(deltaY, deltaX));
+                // 필드 절대 각도 (내 위치 -> 태그 위치) (단위: inch, rad)
+                double deltaX = tagPose.getX() - robotPose.getX();
+                double deltaY = tagPose.getY() - robotPose.getY();
+                double fieldHeading = Math.atan2(deltaY, deltaX);
 
-                // 로봇 헤딩 보정
-                double robotHeading = Math.toDegrees(robotPose.getHeading());
+                // 로봇 헤딩 보정 (단위: rad)
+                double robotHeading = robotPose.getHeading();
 
-                // 터렛이 봐야 할 절대 각도
+                // 터렛이 봐야 할 절대 각도 (단위: rad)
                 targetAngle = fieldHeading - robotHeading;  // 부호 확인
             }
         }

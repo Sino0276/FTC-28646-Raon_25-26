@@ -32,7 +32,7 @@ dependencies {
     implementation 'com.android.extensions.xr:extensions-xr:1.1.0'
 
     implementation 'org.apache.commons:commons-math3:3.6.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.0'
 
     implementation "com.acmerobotics.dashboard:dashboard:0.5.1" //ftc dashboard
 

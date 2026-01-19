@@ -54,14 +54,14 @@ public class FlywheelWithTagCommand extends CommandBase {
             Pose tagPose = APRILTAG_POS.get(tagID);
             Pose robotPose = follower.getPose();
 
-            // 피타고라스 정리로 수평 거리 계산 (단위: Inch)
+            // 피타고라스 정리로 수평 거리 계산 (단위: inch)
             // (높이 차이는 Subsystem 내부 물리 공식에 포함되어 있으므로 수평 거리만 구함)
-            double deltaX = tagPose.getX() - (robotPose.getX() * 25.4);
-            double deltaY = tagPose.getY() - (robotPose.getY() * 25.4);
+            double deltaX = tagPose.getX() - robotPose.getX();
+            double deltaY = tagPose.getY() - robotPose.getY();
             distance = Math.hypot(deltaX, deltaY);
         }
 
-        // 3. 서브시스템에 거리(mm)를 주고 최적의 RPM 계산
+        // 3. 서브시스템에 거리(inch)를 주고 최적의 RPM 계산
         double targetRPM = flywheel.calculateShootingVelocity(distance);
 
         // 모터 구동

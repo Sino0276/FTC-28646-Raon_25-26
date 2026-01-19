@@ -15,20 +15,23 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     // 물리적 제원 (보정)
     public static double SHOOTER_EFFICIENCY = 0.58; // 효율계수 (0.0 ~ 1.0) 1은 슬립 X // 튜닝 할 것
-    private final double FLYWHEEL_RADIUS; // 바퀴 반지름
+    private final double FLYWHEEL_RADIUS; // 바퀴 반지름 (inch)
     private final double GEAR_RATIO; // 기어비
 
     // 포물선 운동 상수
-    private final double delta_h; // 수직 높이 차이 (mm)
-    private final double theta; // 기본 발사 각도 (rad)
-    private final double g = 9800; // 중력 가속도 (mm/s^2)
+    private final double delta_h; // 수직 높이 차이 (inch)
+    private final double theta; // 기본 발사 각도 (rad) [내부 연산용]
+
+    // [단위 변환됨] 중력 가속도 (inch/s^2)
+    // 기존 9800 mm/s^2 / 25.4 ≈ 385.82677
+    private final double g = 385.827;
 
     // PIDF
     public static double kP = 0,
-                         kI = 0,
-                         kD = 0,
-                         kS = 0,
-                         kV = 0;
+            kI = 0,
+            kD = 0,
+            kS = 0,
+            kV = 0;
 
     // RPM 도달 허용 오차
     public static double VELOCITY_TOLERANCE = 50.0;
@@ -38,6 +41,9 @@ public class FlywheelSubsystem extends SubsystemBase {
     /**
      * 모터 초기화 및 설정
      * @param hardwareMap
+     * @param flyWheelRadius 단위: inch
+     * @param delta_h 단위: inch
+     * @param theta 단위: rad
      */
     public FlywheelSubsystem(HardwareMap hardwareMap, String motorName, Motor.GoBILDA motorType,
                              double gearRatio, double shooterEfficiency, double flyWheelRadius, double delta_h, double theta) {
@@ -45,6 +51,8 @@ public class FlywheelSubsystem extends SubsystemBase {
         this.SHOOTER_EFFICIENCY = shooterEfficiency;
         this.FLYWHEEL_RADIUS = flyWheelRadius;
         this.delta_h = delta_h;
+
+        // 삼각함수(Math.tan, Math.cos) 계산을 위해 라디안 필수
         this.theta = theta;
 
         // 플라이휠 초기화
@@ -103,7 +111,7 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return
      */
     public boolean isReady() {
-        // [변경됨] CPR 값을 직접 호출하여 계산
+        // CPR 값을 직접 호출하여 계산
         double cpr = flywheelMotor.getCPR();
         double currentRPM = (flywheelMotor.getCorrectedVelocity() * 60) / cpr;
 
@@ -111,18 +119,21 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     /**
-     * @param distance distancUnit: MM
-     * @return
+     * @param distance distanceUnit: inch
+     * @return 모터 RPM
      */
     public double calculateShootingVelocity(double distance) {
+        // distance(inch), delta_h(inch) -> tan(theta)는 무차원
+        // theta는 이미 생성자에서 rad로 변환됨
         double discriminant = (distance * Math.tan(theta)) - delta_h;
 
         if (discriminant > 0) {
+            // g(inch/s^2), distance(inch) -> 결과 v0는 inch/s
             double v0 = Math.sqrt(
                     (g * distance * distance) / (2 * Math.pow(Math.cos(theta), 2) * discriminant)
             );
 
-            // 선속도(mm/s) -> 모터 RPM 변환
+            // 선속도(inch/s) -> 모터 RPM 변환
             return calculateRPMFromVelocity(v0);
         } else {
             // 발사 불가능한 각도(위치)라면 모터 회전x
@@ -131,13 +142,14 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     /**
-     * 선속도(mm/s)를 모터 RPM으로 변환
+     * 선속도(inch/s)를 모터 RPM으로 변환
      */
     private double calculateRPMFromVelocity(double v0) {
-        // 1. 휠의 접선 속도 (mm/s)
+        // 1. 휠의 접선 속도 (inch/s)
         double wheelTangentialVelocity = v0 / SHOOTER_EFFICIENCY;
 
         // 2. 휠의 각속도 (rad/s) = v / r
+        // v (inch/s) / r (inch) = rad/s (단위 약분됨)
         double angularVelocityRadPerSec = wheelTangentialVelocity / FLYWHEEL_RADIUS;
 
         // 3. 각속도(rad/s) -> RPM 변환

@@ -16,11 +16,15 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DistanceUnit: Inch
+ * AngleUnit: Radian
+ */
 public class VisionSubsystem extends SubsystemBase {
 
     // --- 튜닝용 상수 (Dashboard) ---
     public static boolean ENABLE_LIVE_VIEW = true; // 경기 중에는 false로 꺼서 CPU 절약 권장
-    public static boolean STREAM_CAMERA = true;    // 대시보드 스트리밍 여부
+    public static boolean STREAM_CAMERA = true; // 대시보드 스트리밍 여부
 
     // --- 하드웨어 객체 ---
     private final AprilTagProcessor aprilTag;
@@ -32,7 +36,7 @@ public class VisionSubsystem extends SubsystemBase {
     public VisionSubsystem(HardwareMap hardwareMap, String webcamName) {
         // 1. AprilTag 프로세서 빌드
         aprilTag = new AprilTagProcessor.Builder()
-                .setOutputUnits(DistanceUnit.MM, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 // ftc-docs.firstinspires.org/en/latest/programming_resources/vision/camera_calibration/camera-calibration.html
                 // .setLensIntrinsics(...) // 필요 시 카메라 캘리브레이션 값 입력 (중요)
                 // fx, fy, cx, cy
@@ -65,13 +69,6 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * 특정 ID의 AprilTag가 현재 감지되고 있는지 확인.
-     */
-    public boolean isTagVisible(int id) {
-        return getDetection(id) != null;
-    }
-
-    /**
      * 특정 ID의 태그 정보를 반환. (없으면 null)
      */
     public AprilTagDetection getDetection(int id) {
@@ -84,7 +81,14 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * [Flywheel용] 태그까지의 거리를 반환. (단위: MM)
+     * 특정 ID의 AprilTag가 현재 감지되고 있는지 확인.
+     */
+    public boolean isTagVisible(int id) {
+        return getDetection(id) != null;
+    }
+
+    /**
+     * [Flywheel용] 태그까지의 거리를 반환. (단위: inch)
      * 감지되지 않으면 -1을 반환.
      */
     public double getDistance(int id) {
@@ -99,9 +103,9 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * [Turret용] 태그가 카메라 중심에서 얼마나 틀어져 있는지 각도를 반환. (단위: Degree)
+     * [Turret용] 태그가 카메라 중심에서 얼마나 틀어져 있는지 각도를 반환. (단위: Rad)
      * 감지되지 않으면 0을 반환.
-     * 왼쪽이 (+), 오른쪽이 (-) 인지 확인 후 사용해야 합. (보통 bearing은 반시계가 +)
+     * 왼쪽이 (+), 오른쪽이 (-) 인지 확인 후 사용해야 합. (보통 bearing은 반시계(CCW)가 +)
      * 삼각함수 배울때 사용하는 단위원을 떠올리면 이해가 쉽다~
      */
     public double getAngle(int id) {

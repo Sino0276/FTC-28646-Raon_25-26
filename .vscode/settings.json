@@ -1,0 +1,19 @@
+{
+    // [추가됨] 빌드 설정 파일(build.gradle 등) 변경 시, 묻지 않고 자동으로 프로젝트 구성 업데이트
+    "java.configuration.updateBuildConfiguration": "automatic",
+
+    // 1. 시스템에 설치된 Gradle 대신, 프로젝트의 gradlew(Wrapper)를 최우선으로 사용합니다.
+    "java.import.gradle.wrapper.enabled": true,
+
+    // 2. Gradle 실행 시 사용할 Java 버전을 명시할 수 있습니다. (필요 시 주석 해제 후 경로 수정)
+    // Windows 예시: "C:\\Program Files\\Java\\jdk-23..." 또는 Android Studio jbr 경로
+    // "java.import.gradle.java.home": "C:\\Program Files\\Java\\jdk-23.0.2",
+
+    // 3. 빌드 관련 파일 제외 (검색 및 탐색기 성능 향상)
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    }
+}

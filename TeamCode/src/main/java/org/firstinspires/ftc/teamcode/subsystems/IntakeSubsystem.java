@@ -3,16 +3,14 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-import com.arcrobotics.ftclib.util.LUT;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class IntakeSubsystem extends SubsystemBase {
     // p, i, d, s, v, a
-    public static double p, i, d, s, v, a;
+    public static double kp, ki, kd, ks, kv, ka;
 
-    private final double ticksPerDegree;
+    private final double ticksPerRadian;
     private final MotorEx intakeMotor;
-
 
     public static class Builder {
         private final HardwareMap hardwareMap;
@@ -67,16 +65,16 @@ public class IntakeSubsystem extends SubsystemBase {
         // ZeroPowerBehavior
         intakeMotor.setZeroPowerBehavior(builder.zeroPowerBehavior);
 
-        // 1degree당 필요한 틱 수
-        ticksPerDegree = (intakeMotor.getCPR() * builder.gearRatio) / 360.0;
+        // 1rad당 필요한 틱 수
+        ticksPerRadian = (intakeMotor.getCPR() * builder.gearRatio) / (2 * Math.PI);
 
         // PIDF 계수 설정
         updateCoefficients();
     }
 
     public void updateCoefficients() {
-        intakeMotor.setVeloCoefficients(p, i, d);
-        intakeMotor.setFeedforwardCoefficients(s, v, a);
+        intakeMotor.setVeloCoefficients(kp, ki, kd);
+        intakeMotor.setFeedforwardCoefficients(ks, kv, ka);
     }
 
     private double rpmToTps(double rpm) {
