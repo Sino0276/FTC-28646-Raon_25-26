@@ -66,7 +66,7 @@ public class TurretSubsystem extends SubsystemBase {
      * @param radian 목표 각도 (라디안 단위)
      */
     public void turnToAngle(double radian) {
-        // 각도 정규화 (-pi ~ pi)
+        // 각도 정규화 (-pi/2 ~ pi/2)
         double targetAngle = Range.clip(normalizeAngle(radian), -Math.PI / 2, Math.PI / 2);
         int targetTicks = (int) (targetAngle * ticksPerRadian);
 

@@ -40,7 +40,8 @@ public class ttttttteeeeeeeeeesssssssssttttttt extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // 1. 하드웨어 & 서브시스템 초기화
-        flywheel = new FlywheelSubsystem(hardwareMap, "flywheelMotor", Motor.GoBILDA.BARE, 1, 0.58, 48, 984.5, Math.toRadians(50)); // 모터 이름 확인
+        // FlywheelCommand는 물리적 제원이 필요 없으므로 간단한 생성자 사용
+        flywheel = new FlywheelSubsystem(hardwareMap, "flywheelMotor", Motor.GoBILDA.BARE);
         turret = new TurretSubsystem(hardwareMap, "turretMotor", Motor.GoBILDA.RPM_312, (double) 70 / 10);
         vision = new VisionSubsystem(hardwareMap, "Webcam 1");
 

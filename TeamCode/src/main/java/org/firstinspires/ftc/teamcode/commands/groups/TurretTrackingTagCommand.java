@@ -54,7 +54,7 @@ public class TurretTrackingTagCommand extends CommandBase {
 
             해결: 터렛이 고속으로 움직일 때는 오차가 큽니다. 터렛이 거의 멈췄을 때만 비전 보정을 하거나, poseNet 처럼 카메라 캡처 타임스탬프를 이용한 복잡한 보정이 필요합니다. (초보자라면 일단 감수하고 사용하되, P게인을 낮게 잡으세요.)
              */
-            targetAngle = turret.getAngle() + vision.getAngle(tagID);   // 부호 확인
+            targetAngle = turret.getAngle() - vision.getAngle(tagID);   // 부호 확인
         }
 
         // 2. Odometry 기반 추적 (Open-Loop / Fallback)
