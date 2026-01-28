@@ -10,19 +10,25 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.commands.groups.TurretTrackingTagCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.FlywheelCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.IntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.mech.LiftCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.TurretJoystickCommand;
+import org.firstinspires.ftc.teamcode.commands.mech.WaitForTagCommand;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
 @TeleOp(name = "DriveTest", group = "TeleOp")
 public class DriveTest extends CommandOpMode {
     private FlywheelSubsystem flywheel;
     private TurretSubsystem turret;
-    // private VisionSubsystem vision;
+    private VisionSubsystem vision;
     private IntakeSubsystem intakeFront, intakeBack;
+    private LiftSubsystem lift;
     // private Follower follower;
 
     // 게임패드 선언
@@ -44,7 +50,7 @@ public class DriveTest extends CommandOpMode {
         // 1. 하드웨어 & 서브시스템 초기화
         flywheel = new FlywheelSubsystem(hardwareMap, "flywheel", Motor.GoBILDA.BARE, 1, 0.58, 48, 984.5 - 0, Math.toRadians(50));
         turret = new TurretSubsystem(hardwareMap, "turret", Motor.GoBILDA.RPM_312, (double) 80 / 10);
-
+        vision = new VisionSubsystem(hardwareMap, "Webcam 1");
         intakeFront = new IntakeSubsystem.Builder(hardwareMap, "intakeFront")
                 .motor(Motor.GoBILDA.RPM_1150)
                 .gearRatio(1)
@@ -55,12 +61,14 @@ public class DriveTest extends CommandOpMode {
         intakeBack = new IntakeSubsystem.Builder(hardwareMap, "intakeBack")
                 .motor(Motor.GoBILDA.RPM_1150)
                 .gearRatio(1)
-                .reverse(false)
+                .reverse(true)
                 .ZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
                 .build();
 
+        lift = new LiftSubsystem(hardwareMap, "lift");
+
         // 서브시스템 등록 (Default Command 실행 및 주기적 업데이트 보장)
-        register(turret, flywheel, intakeFront, intakeBack);
+        register(turret, flywheel, intakeFront, intakeBack, lift, vision);
 
         // 2. 게임패드 초기화
         player1 = new GamepadEx(gamepad1);
@@ -69,6 +77,8 @@ public class DriveTest extends CommandOpMode {
         // 3. 버튼 바인딩
         // 터렛 조이스틱 제어 (Default Command)
         turret.setDefaultCommand(new TurretJoystickCommand(turret, () -> player2.getLeftX()));
+//        player2.getGamepadButton(GamepadKeys.Button.A)
+//                        .whileHeld(new TurretTrackingTagCommand(turret, vision, ));
 
         // 슈터 키바인딩
         player2.getGamepadButton(GamepadKeys.Button.B)
@@ -80,6 +90,10 @@ public class DriveTest extends CommandOpMode {
         player2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .toggleWhenPressed(new IntakeCommand(intakeBack, 500));
 
+        // 리프트 키바인딩
+        player2.getGamepadButton(GamepadKeys.Button.X)
+                .whenHeld(new LiftCommand(lift));
+
         // 구동 모터 초기화
         mtr_rr = hardwareMap.get(DcMotorEx.class, "mtr_rr");
         mtr_rf = hardwareMap.get(DcMotorEx.class, "mtr_rf");
@@ -87,8 +101,6 @@ public class DriveTest extends CommandOpMode {
         mtr_lf = hardwareMap.get(DcMotorEx.class, "mtr_lf");
         mtr_lr.setDirection(DcMotorEx.Direction.REVERSE);
         mtr_lf.setDirection(DcMotorEx.Direction.REVERSE);
-
-        turret.center();
     }
 
     @Override

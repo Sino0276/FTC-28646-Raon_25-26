@@ -5,8 +5,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+@TeleOp(name = "TurretZeropointSetting", group = "TeleOp")
 public class TurretZeropointSetting extends OpMode {
 
     private MotorEx turretMotor;
@@ -24,5 +26,6 @@ public class TurretZeropointSetting extends OpMode {
     @Override
     public void loop() {
         telemetry.addData("heading", turretMotor.getCurrentPosition());
+        telemetry.update();
     }
 }

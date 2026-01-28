@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.commands.mech.LiftCommand;
 import org.firstinspires.ftc.teamcode.subsystems.LiftSubsystem;
 
-@Config
 @TeleOp (name="LiftTest", group = "Test")
 public class LitfTest extends CommandOpMode {
 
@@ -27,6 +26,8 @@ public class LitfTest extends CommandOpMode {
         // 3. 버튼 동작 바인딩
         driverGamepad.getGamepadButton(GamepadKeys.Button.X)
                 .whenHeld(new LiftCommand(lift));
+
+        register(lift);
     }
 
     @Override

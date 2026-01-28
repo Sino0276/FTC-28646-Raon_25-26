@@ -13,6 +13,7 @@ public class TurretSubsystem extends SubsystemBase {
     private MotorEx turretMotor;
     private final double ticksPerRadian; // 1rad 당 필요한 틱 수 (자동 계산됨)
     private double power = 0.7;
+    public static final double MAX_ANGLE = 0.9, MIN_ANGLE = -0.9;
 
     // PIDF
     public static double
@@ -60,7 +61,7 @@ public class TurretSubsystem extends SubsystemBase {
      * @param power Range: -1.0 ~ 1.0
      */
     private void setSpeed(double power) {
-        this.power = Range.clip(power, -1.0, 1.0);
+        this.power = Range.clip(power, MIN_ANGLE, MAX_ANGLE);
     }
 
     /**
@@ -69,7 +70,9 @@ public class TurretSubsystem extends SubsystemBase {
      */
     public void turnToAngle(double radian) {
         // 각도 정규화 (-pi/2 ~ pi/2)
-        double targetAngle = Range.clip(normalizeAngle(radian), -Math.PI / 2, Math.PI / 2);
+//        double targetAngle = Range.clip(normalizeAngle(radian), -Math.PI / 2, Math.PI / 2);
+        // 각도 정규화 (-1 ~ 1)
+        double targetAngle = Range.clip(normalizeAngle(radian), -0.9, 0.9);
         int targetTicks = (int) (targetAngle * ticksPerRadian);
 
         // 위치 제어로 변경 후 이동 (예시)
@@ -111,7 +114,7 @@ public class TurretSubsystem extends SubsystemBase {
      * 터렛을 정면(0도)으로 정렬합니다.
      */
     public void center() {
-        turnToAngle(0.0);
+        turnToAngle(0);
     }
 
     public void stop() {

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 @Config
 public class IntakeSubsystem extends SubsystemBase {
     // p, i, d, s, v, a
-    public static double kp, ki, kd, ks, kv, ka;
+    public static double kp, ki, kd, ks, kv = 1.0, ka;
 
     private final double ticksPerRadian;
     private final MotorEx intakeMotor;

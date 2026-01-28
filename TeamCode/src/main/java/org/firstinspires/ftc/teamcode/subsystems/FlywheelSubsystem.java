@@ -31,7 +31,7 @@ public class FlywheelSubsystem extends SubsystemBase {
             kI = 0,
             kD = 0,
             kS = 0,
-            kV = 1;
+            kV = 0.89;
 
     // RPM 도달 허용 오차
     public static double VELOCITY_TOLERANCE = 50.0;
