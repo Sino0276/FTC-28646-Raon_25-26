@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+@Config
 public class IntakeSubsystem extends SubsystemBase {
     // p, i, d, s, v, a
     public static double kp, ki, kd, ks, kv, ka;

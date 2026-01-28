@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
+@Config
 public class TurretSubsystem extends SubsystemBase {
 
     private MotorEx turretMotor;
@@ -14,7 +16,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // PIDF
     public static double
-            kP = 0,
+            kP = 0.02,
             kS = 0,
             kV = 0;
 
