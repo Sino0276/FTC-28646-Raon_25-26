@@ -24,6 +24,12 @@ public class LiftCommand extends CommandBase {
     }
 
     @Override
+    public void execute() {
+        super.execute();
+        lift.setPosition(LiftSubsystem.MAX);
+    }
+
+    @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
         lift.setPosition(LiftSubsystem.MIN);
