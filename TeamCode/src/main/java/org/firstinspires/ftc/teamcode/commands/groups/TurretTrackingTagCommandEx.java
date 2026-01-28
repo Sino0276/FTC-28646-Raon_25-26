@@ -13,20 +13,27 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
  * 1. Import 확인: com.pedropathing.localization.Pose 인지 geometry.Pose 인지 확인하여 빨간 줄이 뜨면 수정해주세요. <p>
  * 2. 부호 테스트: 실제 주행 시 터렛이 반대로 돌면 + vision.getAngle을 -로, 혹은 fieldHeading - robotHeading을 + 등으로 상황에 맞춰 부호만 바꿔주시면 됩니다.
  */
-public class TurretTrackingTagCommand extends CommandBase {
+/**
+ * TurretTrackingTagCommand.java의 확장으로 태그가 인식되지 않은 상황에서도,\
+ * 사전에 입력된 aprilTag의 위치를 받아와 추적 합니다.
+ */
+public class TurretTrackingTagCommandEx extends CommandBase {
     private final TurretSubsystem turret;
     private final VisionSubsystem vision;
+    private final Follower follower;
     private final int tagID;
 
     /**
      * @param turret turretSubsystem
      * @param vision cameraSubsystem
+     * @param follower PedroPathing follower
      * @param tagID AprilTag ID
      */
-    public TurretTrackingTagCommand(TurretSubsystem turret, VisionSubsystem vision, int tagID) {
+    public TurretTrackingTagCommandEx(TurretSubsystem turret, VisionSubsystem vision, Follower follower, int tagID) {
         this.turret = turret;
         this.vision = vision;
         this.tagID = tagID;
+        this.follower = follower;
 
         // Vision은 읽기만 할것이기에 서브시스템에 추가(독점)하지 않음 -> 병렬 실행 가능
         addRequirements(turret);
@@ -49,11 +56,27 @@ public class TurretTrackingTagCommand extends CommandBase {
 
             해결: 터렛이 고속으로 움직일 때는 오차가 큽니다. 터렛이 거의 멈췄을 때만 비전 보정을 하거나, poseNet 처럼 카메라 캡처 타임스탬프를 이용한 복잡한 보정이 필요합니다. (초보자라면 일단 감수하고 사용하되, P게인을 낮게 잡으세요.)
              */
-            double targetAngle = turret.getAngle() - vision.getAngle(tagID);   // 부호 확인
-            // 최종 명령: 계산된 절대 각도로 회전
+            double targetAngle = turret.getAngle() - vision.getAngle(tagID);    // 부호 확인
             turret.turnToAngle(targetAngle);
         }
-        // Tag 인식X -> 행동X
+
+        // 2. Odometry 기반 추적 (Open-Loop / Fallback)
+        else if (APRILTAG_POS.containsKey(tagID)){
+            Pose tagPose = APRILTAG_POS.get(tagID);
+            Pose robotPose = follower.getPose();
+
+            // 필드 절대 각도 (내 위치 -> 태그 위치) (단위: inch, rad)
+            double deltaX = tagPose.getX() - robotPose.getX();
+            double deltaY = tagPose.getY() - robotPose.getY();
+            double fieldHeading = Math.atan2(deltaY, deltaX);
+            // 로봇 헤딩 보정 (단위: rad)
+            double robotHeading = robotPose.getHeading();
+
+            // 터렛이 봐야 할 절대 각도 (단위: rad)
+            double targetAngle = fieldHeading - robotHeading;   // 부호 확인
+            turret.turnToAngle(targetAngle);
+        }
+        // 3. 정보 없음 → 행동X (마지막 명령 유지)
     }
 
     // 커맨드 종료 시

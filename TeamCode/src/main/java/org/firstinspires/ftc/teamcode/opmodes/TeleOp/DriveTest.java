@@ -10,12 +10,10 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.commands.groups.TurretTrackingTagCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.FlywheelCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.IntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.LiftCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.TurretJoystickCommand;
-import org.firstinspires.ftc.teamcode.commands.mech.WaitForTagCommand;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LiftSubsystem;

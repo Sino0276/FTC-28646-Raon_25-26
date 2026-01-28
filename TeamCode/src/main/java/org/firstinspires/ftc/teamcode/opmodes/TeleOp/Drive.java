@@ -11,8 +11,8 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.commands.groups.FlywheelWithTagCommand;
-import org.firstinspires.ftc.teamcode.commands.groups.TurretTrackingTagCommand;
+import org.firstinspires.ftc.teamcode.commands.groups.FlywheelWithTagCommandEx;
+import org.firstinspires.ftc.teamcode.commands.groups.TurretTrackingTagCommandEx;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
@@ -63,10 +63,10 @@ public class Drive extends CommandOpMode {
 
         // 3. 버튼 바인딩 (여기가 핵심!)
         player2.getGamepadButton(GamepadKeys.Button.X)
-                .toggleWhenActive(new FlywheelWithTagCommand(flywheel, vision, follower, TARGET_TAG_ID));
+                .toggleWhenActive(new FlywheelWithTagCommandEx(flywheel, vision, follower, TARGET_TAG_ID));
 
         player2.getGamepadButton(GamepadKeys.Button.Y)
-                .toggleWhenActive(new TurretTrackingTagCommand(turret, vision, follower, TARGET_TAG_ID));
+                .toggleWhenActive(new TurretTrackingTagCommandEx(turret, vision, follower, TARGET_TAG_ID));
 
 
 
