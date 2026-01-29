@@ -7,9 +7,13 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.commands.groups.TurretTrackingTagCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.FlywheelCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.IntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.LiftCommand;
@@ -32,7 +36,7 @@ public class DriveTest extends CommandOpMode {
     // 게임패드 선언
     private GamepadEx player1, player2;
 
-    private DcMotorEx mtr_rr, mtr_rf, mtr_lr, mtr_lf;
+    private MotorEx mtr_rr, mtr_rf, mtr_lr, mtr_lf;
 
     // 타겟 정보 (예: Red Alliance 골대)
     private final int TARGET_TAG_ID = 20;
@@ -75,17 +79,18 @@ public class DriveTest extends CommandOpMode {
         // 3. 버튼 바인딩
         // 터렛 조이스틱 제어 (Default Command)
         turret.setDefaultCommand(new TurretJoystickCommand(turret, () -> player2.getLeftX()));
-//        player2.getGamepadButton(GamepadKeys.Button.A)
-//                        .whileHeld(new TurretTrackingTagCommand(turret, vision, ));
+        // 터렛 트랙킹
+        player2.getGamepadButton(GamepadKeys.Button.A)
+                        .toggleWhenPressed(new TurretTrackingTagCommand(turret, vision, TARGET_TAG_ID));
 
         // 슈터 키바인딩
         player2.getGamepadButton(GamepadKeys.Button.B)
-                .toggleWhenPressed(new FlywheelCommand(flywheel, 5500));
+                .toggleWhenPressed(new FlywheelCommand(flywheel, 4000));
 
         // 인테이크 키바인딩
-        player2.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+        player2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .toggleWhenPressed(new IntakeCommand(intakeFront, 500));
-        player2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+        player2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .toggleWhenPressed(new IntakeCommand(intakeBack, 500));
 
         // 리프트 키바인딩
@@ -93,12 +98,17 @@ public class DriveTest extends CommandOpMode {
                 .whenHeld(new LiftCommand(lift));
 
         // 구동 모터 초기화
-        mtr_rr = hardwareMap.get(DcMotorEx.class, "mtr_rr");
-        mtr_rf = hardwareMap.get(DcMotorEx.class, "mtr_rf");
-        mtr_lr = hardwareMap.get(DcMotorEx.class, "mtr_lr");
-        mtr_lf = hardwareMap.get(DcMotorEx.class, "mtr_lf");
-        mtr_lr.setDirection(DcMotorEx.Direction.REVERSE);
-        mtr_lf.setDirection(DcMotorEx.Direction.REVERSE);
+        mtr_rr = new MotorEx(hardwareMap, "mtr_rr");
+        mtr_rf = new MotorEx(hardwareMap, "mtr_rf");
+        mtr_lr = new MotorEx(hardwareMap, "mtr_lr");
+        mtr_lf = new MotorEx(hardwareMap, "mtr_lf");
+        mtr_rr.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        mtr_rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        mtr_lr.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        mtr_lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        mtr_lr.setInverted(true);
+        mtr_lf.setInverted(true);
+
     }
 
     @Override
@@ -119,12 +129,12 @@ public class DriveTest extends CommandOpMode {
         // 수동 주행 제어 (gamepad1 직접 사용)
         double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y;
-        double rx = gamepad1.right_stick_x;
+        double rx = 0.7 * gamepad1.right_stick_x;
 
-        mtr_lf.setPower(0.6 * (y + x + rx));
-        mtr_rf.setPower(0.6 * (y - x - rx));
-        mtr_lr.setPower(0.6 * (y - x + rx));
-        mtr_rr.setPower(0.6 * (y + x - rx));
+        mtr_lf.set(0.8 * Range.clip(y + x + rx, -1, 1));
+        mtr_rf.set(0.8 * Range.clip(y - x - rx, -1, 1));
+        mtr_lr.set(0.8 * Range.clip(y - x + rx, -1, 1));
+        mtr_rr.set(0.8 * Range.clip(y + x - rx, -1, 1));
 
         // 상태 모니터링
         showTelemetry();

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -10,10 +12,11 @@ import com.qualcomm.robotcore.util.Range;
 @Config
 public class TurretSubsystem extends SubsystemBase {
 
+    public static final double MAX_ANGLE = 0.85, MIN_ANGLE = -0.85;
+
     private MotorEx turretMotor;
     private final double ticksPerRadian; // 1rad 당 필요한 틱 수 (자동 계산됨)
-    private double power = 0.7;
-    public static final double MAX_ANGLE = 0.9, MIN_ANGLE = -0.9;
+    private double power = 0.5;
 
     // PIDF
     public static double
@@ -21,7 +24,7 @@ public class TurretSubsystem extends SubsystemBase {
             kS = 0,
             kV = 0;
 
-    public static double TOLERANCE = 0.01;
+    public static double TOLERANCE = 10;
 
 
 
@@ -61,7 +64,7 @@ public class TurretSubsystem extends SubsystemBase {
      * @param power Range: -1.0 ~ 1.0
      */
     private void setSpeed(double power) {
-        this.power = Range.clip(power, MIN_ANGLE, MAX_ANGLE);
+        this.power = Range.clip(power, -1, 1);
     }
 
     /**
@@ -72,13 +75,14 @@ public class TurretSubsystem extends SubsystemBase {
         // 각도 정규화 (-pi/2 ~ pi/2)
 //        double targetAngle = Range.clip(normalizeAngle(radian), -Math.PI / 2, Math.PI / 2);
         // 각도 정규화 (-1 ~ 1)
-        double targetAngle = Range.clip(normalizeAngle(radian), -0.9, 0.9);
+        double targetAngle = Range.clip(normalizeAngle(radian), MIN_ANGLE, MAX_ANGLE);
         int targetTicks = (int) (targetAngle * ticksPerRadian);
 
         // 위치 제어로 변경 후 이동 (예시)
         turretMotor.setRunMode(Motor.RunMode.PositionControl);
         turretMotor.setTargetPosition(targetTicks);
         turretMotor.set(power);
+
     }
 
     /**

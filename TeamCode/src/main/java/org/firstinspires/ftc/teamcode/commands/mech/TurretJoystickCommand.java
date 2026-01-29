@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.commands.mech;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+@Config
 public class TurretJoystickCommand extends CommandBase {
 
+    public static double sensitivity; // 회전 속도 민감도
     private final TurretSubsystem turret;
     private final DoubleSupplier joystickInput;
-    private final double sensitivity; // 회전 속도 민감도
 
     /**
      * @param turret 터렛 서브시스템
@@ -20,7 +22,7 @@ public class TurretJoystickCommand extends CommandBase {
         this.turret = turret;
         this.joystickInput = joystickInput;
         // 민감도 조절: 루프당 회전할 라디안 값 (이 값을 키우면 더 빨리 돕니다)
-        this.sensitivity = 0.05;
+        this.sensitivity = 0.1;
 
         // 이 명령이 터렛을 제어함을 명시
         addRequirements(turret);

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -31,7 +33,8 @@ public class FlywheelSubsystem extends SubsystemBase {
             kI = 0,
             kD = 0,
             kS = 0,
-            kV = 0.89;
+            kV = 2.0
+                    ;
 
     // RPM 도달 허용 오차
     public static double VELOCITY_TOLERANCE = 50.0;
@@ -113,6 +116,19 @@ public class FlywheelSubsystem extends SubsystemBase {
     public void updateCoefficients() {
         flywheelMotor.setVeloCoefficients(kP, kI, kD);
         flywheelMotor.setFeedforwardCoefficients(kS, kV);
+    }
+
+    public double getCurrentRPM() {
+        // TPS -> RPM
+        return tpsToRpm(flywheelMotor.getVelocity());
+    }
+
+    private double rpmToTps(double rpm) {
+        return (rpm * flywheelMotor.getCPR()) / 60.0;
+    }
+
+    private double tpsToRpm(double tps) {
+        return (tps * 60.0) / flywheelMotor.getCPR();
     }
 
     /**

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands.mech;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
@@ -8,6 +10,7 @@ public class FlywheelCommand extends CommandBase {
 
     private final FlywheelSubsystem flywheel;
     private final double targetRPM;
+    private TelemetryPacket packet;
 
     /**
      *
@@ -17,6 +20,7 @@ public class FlywheelCommand extends CommandBase {
     public FlywheelCommand(FlywheelSubsystem subsystem, double rpm) {
         this.flywheel = subsystem;
         this.targetRPM = rpm;
+        packet = new TelemetryPacket();
 
         addRequirements(subsystem);
     }
@@ -31,6 +35,10 @@ public class FlywheelCommand extends CommandBase {
     @Override
     public void execute() {
         flywheel.updateCoefficients();
+
+        packet.put("Shooter_Current", flywheel.getCurrentRPM());
+        packet.put("Shooter_Target", targetRPM);
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 
     // 커맨드 종료 시
