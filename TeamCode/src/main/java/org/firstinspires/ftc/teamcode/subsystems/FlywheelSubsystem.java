@@ -29,11 +29,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     private final double g = 385.827;
 
     // PIDF
-    public static double kP = 5,
+    public static double kP = 8,
             kI = 0,
-            kD = 0,
+            kD = 0.1,
             kS = 1,
-            kV = 2.0
+            kV = 2.35
                     ;
 
     // RPM 도달 허용 오차
