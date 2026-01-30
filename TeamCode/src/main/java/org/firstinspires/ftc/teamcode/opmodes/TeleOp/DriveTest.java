@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.commands.groups.FlywheelWithTagCommand;
 import org.firstinspires.ftc.teamcode.commands.groups.TurretTrackingTagCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.FlywheelCommand;
 import org.firstinspires.ftc.teamcode.commands.mech.IntakeCommand;
@@ -39,7 +40,13 @@ public class DriveTest extends CommandOpMode {
     private MotorEx mtr_rr, mtr_rf, mtr_lr, mtr_lf;
 
     // 타겟 정보 (예: Red Alliance 골대)
-    private final int TARGET_TAG_ID = 20;
+    private int TARGET_TAG_ID = 20;
+
+    private double POWER = 0.8,
+                   BUMPER_POWER = 0.6;
+
+
+
 
     @Override
     public void initialize() {
@@ -50,7 +57,8 @@ public class DriveTest extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // 1. 하드웨어 & 서브시스템 초기화
-        flywheel = new FlywheelSubsystem(hardwareMap, "flywheel", Motor.GoBILDA.BARE, 1, 0.58, 48, 984.5 - 0, Math.toRadians(50));
+//        flywheel = new FlywheelSubsystem(hardwareMap, "flywheel", Motor.GoBILDA.BARE, 1, 0.304, 1.8897637795275593, 25.19685039370079, Math.toRadians(43.2));
+        flywheel = new FlywheelSubsystem(hardwareMap, "flywheel", Motor.GoBILDA.BARE, 1, 0.4, 1.8897637795275593, 25.19685039370079, 52);
         turret = new TurretSubsystem(hardwareMap, "turret", Motor.GoBILDA.RPM_312, (double) 80 / 10);
         vision = new VisionSubsystem(hardwareMap, "Webcam 1");
         intakeFront = new IntakeSubsystem.Builder(hardwareMap, "intakeFront")
@@ -72,6 +80,41 @@ public class DriveTest extends CommandOpMode {
         // 서브시스템 등록 (Default Command 실행 및 주기적 업데이트 보장)
         register(turret, flywheel, intakeFront, intakeBack, lift, vision);
 
+
+        // red / blue 선택
+        while (!isStarted()) {
+            if (gamepad1.y || gamepad2.y) {
+                telemetry.clearAll();
+                telemetry.addData("State", "OK");
+                telemetry.update();
+                break;
+            }
+            telemetry.clearAll();
+            // Blue Team
+            if (gamepad1.x || gamepad2.x || TARGET_TAG_ID == 20) {
+                TARGET_TAG_ID = 20;
+                telemetry.addData("> BLUE", 20);
+                telemetry.addData("RED", 24);
+                telemetry.addData("Press Y", "To Confirm");
+            }
+
+            // Red Team
+            if (gamepad1.b || gamepad2.b || TARGET_TAG_ID == 24) {
+                TARGET_TAG_ID = 24;
+                telemetry.addData("BLUE", 20);
+                telemetry.addData("> RED", 24);
+                telemetry.addData("Press Y", "To Confirm");
+            }
+            else {
+                telemetry.addData("BLUE", 20);
+                telemetry.addData("RED", 24);
+            }
+            telemetry.update();
+        }
+
+
+
+
         // 2. 게임패드 초기화
         player1 = new GamepadEx(gamepad1);
         player2 = new GamepadEx(gamepad2);
@@ -84,14 +127,16 @@ public class DriveTest extends CommandOpMode {
                         .toggleWhenPressed(new TurretTrackingTagCommand(turret, vision, TARGET_TAG_ID));
 
         // 슈터 키바인딩
+//        player2.getGamepadButton(GamepadKeys.Button.B)
+//                .toggleWhenPressed(new FlywheelCommand(flywheel, 3300));
         player2.getGamepadButton(GamepadKeys.Button.B)
-                .toggleWhenPressed(new FlywheelCommand(flywheel, 4000));
+                .toggleWhenPressed(new FlywheelWithTagCommand(flywheel, vision, TARGET_TAG_ID));
 
         // 인테이크 키바인딩
         player2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .toggleWhenPressed(new IntakeCommand(intakeFront, 500));
+                .whenHeld(new IntakeCommand(intakeFront, 500));
         player2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .toggleWhenPressed(new IntakeCommand(intakeBack, 500));
+                .whileHeld(new IntakeCommand(intakeBack, 500));
 
         // 리프트 키바인딩
         player2.getGamepadButton(GamepadKeys.Button.X)
@@ -108,6 +153,8 @@ public class DriveTest extends CommandOpMode {
         mtr_lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         mtr_lr.setInverted(true);
         mtr_lf.setInverted(true);
+
+
 
     }
 
@@ -131,10 +178,17 @@ public class DriveTest extends CommandOpMode {
         double y = -gamepad1.left_stick_y;
         double rx = 0.7 * gamepad1.right_stick_x;
 
-        mtr_lf.set(0.8 * Range.clip(y + x + rx, -1, 1));
-        mtr_rf.set(0.8 * Range.clip(y - x - rx, -1, 1));
-        mtr_lr.set(0.8 * Range.clip(y - x + rx, -1, 1));
-        mtr_rr.set(0.8 * Range.clip(y + x - rx, -1, 1));
+        if (player2.getButton(GamepadKeys.Button.RIGHT_BUMPER) || player2.getButton(GamepadKeys.Button.LEFT_BUMPER)) {
+            mtr_lf.set(BUMPER_POWER * POWER * Range.clip(y + x + rx, -1, 1));
+            mtr_rf.set(BUMPER_POWER * POWER * Range.clip(y - x - rx, -1, 1));
+            mtr_lr.set(BUMPER_POWER * POWER * Range.clip(y - x + rx, -1, 1));
+            mtr_rr.set(BUMPER_POWER * POWER * Range.clip(y + x - rx, -1, 1));
+        } else {
+            mtr_lf.set(POWER * Range.clip(y + x + rx, -1, 1));
+            mtr_rf.set(POWER * Range.clip(y - x - rx, -1, 1));
+            mtr_lr.set(POWER * Range.clip(y - x + rx, -1, 1));
+            mtr_rr.set(POWER * Range.clip(y + x - rx, -1, 1));
+        }
 
         // 상태 모니터링
         showTelemetry();
@@ -142,7 +196,8 @@ public class DriveTest extends CommandOpMode {
 
     private void showTelemetry() {
         telemetry.addData("Turret Angle", turret.getAngle());
-        telemetry.addData("P2 LeftX", player2.getLeftX());
+        telemetry.addData("Team", TARGET_TAG_ID == 20 ? "Blue" : "Red");
+        telemetry.addData("TagID", TARGET_TAG_ID);
         telemetry.update();
     }
 

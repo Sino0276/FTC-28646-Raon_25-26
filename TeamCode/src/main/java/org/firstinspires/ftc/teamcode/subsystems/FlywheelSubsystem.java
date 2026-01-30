@@ -16,23 +16,23 @@ public class FlywheelSubsystem extends SubsystemBase {
     private MotorEx flywheelMotor;
 
     // 물리적 제원 (보정)
-    public static double SHOOTER_EFFICIENCY = 0.58; // 효율계수 (0.0 ~ 1.0) 1은 슬립 X // 튜닝 할 것
-    private final Double FLYWHEEL_RADIUS; // 바퀴 반지름 (inch) - null 가능
+    public static double SHOOTER_EFFICIENCY = 0.3; // 효율계수 (0.0 ~ 1.0) 1은 슬립 X // 튜닝 할 것
+    public static Double FLYWHEEL_RADIUS; // 바퀴 반지름 (inch) - null 가능
     private final Double GEAR_RATIO; // 기어비 - null 가능
 
     // 포물선 운동 상수
     private final Double delta_h; // 수직 높이 차이 (inch) - null 가능
-    private final Double theta; // 기본 발사 각도 (rad) [내부 연산용] - null 가능
+    public static Double theta; // 기본 발사 각도 (rad) [내부 연산용] - null 가능
 
     // [단위 변환됨] 중력 가속도 (inch/s^2)
     // 기존 9800 mm/s^2 / 25.4 ≈ 385.82677
     private final double g = 385.827;
 
     // PIDF
-    public static double kP = 0,
+    public static double kP = 5,
             kI = 0,
             kD = 0,
-            kS = 0,
+            kS = 1,
             kV = 2.0
                     ;
 
@@ -123,6 +123,10 @@ public class FlywheelSubsystem extends SubsystemBase {
         return tpsToRpm(flywheelMotor.getVelocity());
     }
 
+    public double getActivityEfficient(double distance) {
+        return ((0.0013 * distance) + 0.2119);
+    }
+
     private double rpmToTps(double rpm) {
         return (rpm * flywheelMotor.getCPR()) / 60.0;
     }
@@ -194,7 +198,7 @@ public class FlywheelSubsystem extends SubsystemBase {
                     (g * distance * distance) / (2 * Math.pow(Math.cos(theta), 2) * discriminant));
 
             // 선속도(inch/s) -> 모터 RPM 변환
-            return calculateRPMFromVelocity(v0);
+            return calculateRPMFromVelocity(v0, distance);
         } else {
             // 발사 불가능한 각도(위치)라면 모터 회전x
             return 0;
@@ -204,7 +208,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     /**
      * 선속도(inch/s)를 모터 RPM으로 변환
      */
-    private double calculateRPMFromVelocity(double v0) {
+    private double calculateRPMFromVelocity(double v0, double distance) {
         // 물리적 제원이 설정되지 않은 경우 예외 발생 (이미 calculateShootingVelocity에서 체크되지만 안전을 위해)
         if (FLYWHEEL_RADIUS == null || GEAR_RATIO == null) {
             throw new IllegalStateException("물리적 제원이 설정되지 않았습니다.");
@@ -212,6 +216,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
         // 1. 휠의 접선 속도 (inch/s)
         double wheelTangentialVelocity = v0 / SHOOTER_EFFICIENCY;
+//        double wheelTangentialVelocity = v0 / getActivityEfficient(distance);
 
         // 2. 휠의 각속도 (rad/s) = v / r
         // v (inch/s) / r (inch) = rad/s (단위 약분됨)

@@ -16,7 +16,8 @@ import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
  */
 @Config
 public class TurretTrackingTagCommand extends CommandBase {
-    public static double sensitivity = 0.3;
+    public static double sensitivity = 0.2,
+                        angleDamping = -0.003;
 
     private final TurretSubsystem turret;
     private final VisionSubsystem vision;
@@ -54,7 +55,7 @@ public class TurretTrackingTagCommand extends CommandBase {
 
             해결: 터렛이 고속으로 움직일 때는 오차가 큽니다. 터렛이 거의 멈췄을 때만 비전 보정을 하거나, poseNet 처럼 카메라 캡처 타임스탬프를 이용한 복잡한 보정이 필요합니다. (초보자라면 일단 감수하고 사용하되, P게인을 낮게 잡으세요.)
              */
-            double targetAngle = turret.getAngle() + (sensitivity * vision.getAngle(tagID));   // 부호 확인
+            double targetAngle = turret.getAngle() + (sensitivity * vision.getAngle(tagID)) + angleDamping;   // 부호 확인
             // 최종 명령: 계산된 절대 각도로 회전
             turret.turnToAngle(targetAngle);
         } else {

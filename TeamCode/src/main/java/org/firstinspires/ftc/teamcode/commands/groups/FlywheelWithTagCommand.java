@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Utils.AprilTagPosition.APRILTAG_POS
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.util.InterpLUT;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
@@ -17,6 +18,7 @@ public class FlywheelWithTagCommand extends CommandBase {
     private final int tagID;
 
     private TelemetryPacket packet;
+    private InterpLUT shooterVel;
 
 
     /**
@@ -30,6 +32,20 @@ public class FlywheelWithTagCommand extends CommandBase {
         this.tagID = tagID;
 
         packet = new TelemetryPacket();
+        // Look-Up-Table
+        shooterVel = new InterpLUT();
+        shooterVel.add(0, 3380);
+        shooterVel.add(50, 3380);
+        shooterVel.add(54.9, 3380);
+        shooterVel.add(60, 3400);
+        shooterVel.add(66.7, 3385);
+        shooterVel.add(76, 3428);
+        shooterVel.add(81, 3390);
+        shooterVel.add(97, 3400);
+        shooterVel.add(116, 3471);
+        shooterVel.add(141, 3622);
+        shooterVel.add(204, 3622);
+        shooterVel.createLUT();
 
         // Vision은 읽기만 할것이기에 서브시스템에 추가(독점)하지 않음 -> 병렬 실행 가능
         addRequirements(flywheel);
@@ -43,12 +59,17 @@ public class FlywheelWithTagCommand extends CommandBase {
         // 1. Vision 기반 거리 측정 (Closed-Loop, 1순위)
         if (vision.isTagVisible(this.tagID)) {
             distance = vision.getDistance(tagID);
+            if (distance == -1.0) {
+                return;
+            }
 
             // 2. 서브시스템에 거리(inch)를 주고 최적의 RPM 계산
-            double targetRPM = flywheel.calculateShootingVelocity(distance);
+//            double targetRPM = flywheel.calculateShootingVelocity(distance);
+            double targetRPM = shooterVel.get(distance);
 
             packet.put("Shooter_Current", flywheel.getCurrentRPM());
             packet.put("Shooter_Target", targetRPM);
+            packet.put("Distance", distance);
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
             // 모터 구동
