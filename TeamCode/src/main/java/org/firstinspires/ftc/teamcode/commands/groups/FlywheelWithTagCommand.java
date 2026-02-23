@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.util.InterpLUT;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
+import org.firstinspires.ftc.teamcode.Utils.DistanceShooterVel;
 import org.firstinspires.ftc.teamcode.subsystems.FlywheelSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
@@ -18,7 +19,8 @@ public class FlywheelWithTagCommand extends CommandBase {
     private final int tagID;
 
     private TelemetryPacket packet;
-    private InterpLUT shooterVel;
+    private DistanceShooterVel distanceShooterVel;
+//    private InterpLUT shooterVel;
 
 
     /**
@@ -33,19 +35,21 @@ public class FlywheelWithTagCommand extends CommandBase {
 
         packet = new TelemetryPacket();
         // Look-Up-Table
-        shooterVel = new InterpLUT();
-        shooterVel.add(0, 3380);
-        shooterVel.add(50, 3380);
-        shooterVel.add(54.9, 3380);
-        shooterVel.add(60, 3400);
-        shooterVel.add(66.7, 3385);
-        shooterVel.add(76, 3428);
-        shooterVel.add(81, 3390);
-        shooterVel.add(97, 3400);
-        shooterVel.add(116, 3471);
-        shooterVel.add(141, 3622);
-        shooterVel.add(204, 3622);
-        shooterVel.createLUT();
+        distanceShooterVel = new DistanceShooterVel();
+
+//        shooterVel = new InterpLUT();
+//        shooterVel.add(0, 3380);
+//        shooterVel.add(50, 3380);
+//        shooterVel.add(54.9, 3380);
+//        shooterVel.add(60, 3400);
+//        shooterVel.add(66.7, 3385);
+//        shooterVel.add(76, 3428);
+//        shooterVel.add(81, 3390);
+//        shooterVel.add(97, 3400);
+//        shooterVel.add(116, 3471);
+//        shooterVel.add(141, 3622);
+//        shooterVel.add(204, 3622);
+//        shooterVel.createLUT();
 
         // Vision은 읽기만 할것이기에 서브시스템에 추가(독점)하지 않음 -> 병렬 실행 가능
         addRequirements(flywheel);
@@ -65,7 +69,7 @@ public class FlywheelWithTagCommand extends CommandBase {
 
             // 2. 서브시스템에 거리(inch)를 주고 최적의 RPM 계산
 //            double targetRPM = flywheel.calculateShootingVelocity(distance);
-            double targetRPM = shooterVel.get(distance);
+            double targetRPM = distanceShooterVel.get(distance);
 
             packet.put("Shooter_Current", flywheel.getCurrentRPM());
             packet.put("Shooter_Target", targetRPM);

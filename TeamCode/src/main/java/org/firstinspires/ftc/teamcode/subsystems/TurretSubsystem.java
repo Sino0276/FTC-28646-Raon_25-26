@@ -24,7 +24,7 @@ public class TurretSubsystem extends SubsystemBase {
             kS = 0,
             kV = 0;
 
-    public static double TOLERANCE = 10;
+    public static double TOLERANCE = 100;
 
 
 

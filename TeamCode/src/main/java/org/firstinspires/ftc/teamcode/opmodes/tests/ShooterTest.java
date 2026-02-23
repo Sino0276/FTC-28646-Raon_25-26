@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-@Disabled
+//@Disabled
 @Config
 @TeleOp(name = "ShooterTest", group = "Test")
 public class ShooterTest extends LinearOpMode {

@@ -36,7 +36,7 @@ public class TurretJoystickCommand extends CommandBase {
         // 3. 방향 보정 및 회전량 계산
         // 일반적으로 Gamepad Y축은 위가 -1, 아래가 +1입니다.
         // 상황에 따라 부호를 반대로(-) 바꿔야 원흐는 방향으로 돌 수 있습니다.
-        double deltaAngle = -stickValue * sensitivity;
+        double deltaAngle = stickValue * sensitivity;
 
         // 4. 터렛 회전 (현재 각도에서 deltaAngle 만큼 더하기)
         turret.turnAsAngle(deltaAngle);

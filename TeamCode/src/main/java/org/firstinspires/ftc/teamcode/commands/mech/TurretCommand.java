@@ -33,7 +33,12 @@ public class TurretCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        if ((turret.getAngle() - targetAngle) < TurretSubsystem.TOLERANCE ) {
+        // [수정 핵심] Math.abs() 추가
+        // 현재 각도와 목표 각도의 '차이(절댓값)'가 허용 오차보다 작으면 종료
+        double error = Math.abs(turret.getAngle() - targetAngle);
+
+        // 1. 목표에 도달했거나
+        if (error < TurretSubsystem.TOLERANCE) {
             return true;
         }
 
