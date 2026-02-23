@@ -37,20 +37,6 @@ public class FlywheelWithTagCommand extends CommandBase {
         // Look-Up-Table
         distanceShooterVel = new DistanceShooterVel();
 
-//        shooterVel = new InterpLUT();
-//        shooterVel.add(0, 3380);
-//        shooterVel.add(50, 3380);
-//        shooterVel.add(54.9, 3380);
-//        shooterVel.add(60, 3400);
-//        shooterVel.add(66.7, 3385);
-//        shooterVel.add(76, 3428);
-//        shooterVel.add(81, 3390);
-//        shooterVel.add(97, 3400);
-//        shooterVel.add(116, 3471);
-//        shooterVel.add(141, 3622);
-//        shooterVel.add(204, 3622);
-//        shooterVel.createLUT();
-
         // Vision은 읽기만 할것이기에 서브시스템에 추가(독점)하지 않음 -> 병렬 실행 가능
         addRequirements(flywheel);
     }

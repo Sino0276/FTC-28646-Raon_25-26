@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.TeleOp;
+package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -125,6 +125,10 @@ public class DriveTest extends CommandOpMode {
         // 터렛 트랙킹
         player2.getGamepadButton(GamepadKeys.Button.A)
                         .toggleWhenPressed(new TurretTrackingTagCommand(turret, vision, TARGET_TAG_ID));
+
+        // 터렛 중앙 정렬
+        player2.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON)
+                .whenPressed(() -> turret.center());
 
         // 슈터 키바인딩
 //        player2.getGamepadButton(GamepadKeys.Button.B)

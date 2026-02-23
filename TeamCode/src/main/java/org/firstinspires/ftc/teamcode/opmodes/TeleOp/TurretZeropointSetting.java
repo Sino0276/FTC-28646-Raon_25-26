@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.TeleOp;
+package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -16,7 +16,7 @@ public class TurretZeropointSetting extends OpMode {
 
     @Override
     public void init() {
-        telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         turretMotor = new MotorEx(hardwareMap, "turret", Motor.GoBILDA.RPM_312);
         turretMotor.resetEncoder();
