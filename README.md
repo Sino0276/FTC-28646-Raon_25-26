@@ -15,7 +15,7 @@
 | **팀 번호** | 28646 |
 | **팀 이름** | 라온봇 (Raon Bot) |
 | **소속** | 라온고등학교 |
-| **출전 대회** | KLA (Korea League Autonomy), KRC (Korea Robot Championship) |
+| **출전 대회** | KLA, KRC (Korea Robot Championship) |
 | **개발 언어** | Java |
 | **FTC SDK 버전** | 11.0.0 |
 
